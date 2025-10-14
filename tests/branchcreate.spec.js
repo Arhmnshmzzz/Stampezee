@@ -13,7 +13,7 @@ test('Login and create stamp card', async ({ page, context }) => {
   // Wait for email input to appear
   await page.waitForSelector('input[placeholder="Enter Your Email Address"]', { state: 'visible', timeout: 10000 });
 
-  await page.getByRole('textbox', { name: 'Enter Your Email Address' }).fill('xarota@mailinator.com');
+  await page.getByRole('textbox', { name: 'Enter Your Email Address' }).fill('qotehymuw@mailinator.com');
   await page.getByRole('textbox', { name: 'Enter Your Password' }).fill('Sh@000000');
 
   // Wait before clicking Sign In
