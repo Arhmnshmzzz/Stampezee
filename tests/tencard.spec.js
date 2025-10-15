@@ -5,10 +5,12 @@ test.use({
   launchOptions: { slowMo: 200 },
 });
 
-// Extend timeout for long test
 test.setTimeout(180000); // 3 minutes
 
-test("Login and create 10 valid stamp cards", async ({ page, context }) => {
+test("Login and create 10 fast food–themed stamp cards", async ({
+  page,
+  context,
+}) => {
   await context.clearCookies();
   await page.goto("https://stp2.rootdevs.xyz/en/auth/signin", {
     waitUntil: "domcontentloaded",
@@ -20,20 +22,23 @@ test("Login and create 10 valid stamp cards", async ({ page, context }) => {
     state: "visible",
     timeout: 10000,
   });
+
   await page
     .getByRole("textbox", { name: "Enter Your Email Address" })
-    .type("jaciheli@mailinator.com");
+    .type("xydaseli@mailinator.com");
   await page
     .getByRole("textbox", { name: "Enter Your Password" })
     .fill("Sh@000000");
-  await page.waitForTimeout(1000);
 
   const [response] = await Promise.all([
     page.waitForNavigation({ waitUntil: "networkidle", timeout: 15000 }),
     page.getByRole("button", { name: "Sign In" }).click(),
   ]);
 
-  console.log("Login navigation:", response?.url() || "No navigation detected");
+  console.log(
+    "🔐 Login navigation:",
+    response?.url() || "No navigation detected"
+  );
   await expect(page).toHaveURL(/retailer|dashboard|home/i);
 
   // --- Go to Stamp Card page ---
@@ -42,23 +47,41 @@ test("Login and create 10 valid stamp cards", async ({ page, context }) => {
     { waitUntil: "networkidle" }
   );
 
-  // --- Loop to create 10 cards ---
-  for (let i = 1; i <= 10; i++) {
-    const stampName = `Card ${i} - Promo ${Math.floor(Math.random() * 1000)}`;
-    const stampTitle = `Special Offer ${i}`;
-    const rewardName = `Reward ${i}`;
+  // --- Fast food–specific themes ---
+  const foodThemes = [
+    { title: "Burger Bonanza", desc: "Buy juicy burgers and earn rewards" },
+    { title: "Pizza Lovers Deal", desc: "Collect stamps for cheesy pizza" },
+    { title: "Fried Chicken Feast", desc: "Crunchy deals for chicken lovers" },
+    { title: "French Fry Fiesta", desc: "Get free fries with loyalty stamps" },
+    { title: "Wrap  Roll Combo", desc: "Earn points for every tasty wrap" },
+    {
+      title: "Ice Cream Magic",
+      desc: "Scoop up rewards for your sweet tooth.",
+    },
+    { title: "Taco Time Treats", desc: "Stamp your way to free tacos" },
+    { title: "Hot Dog Haven", desc: "Bite stamp, and earn tasty rewards" },
+  ];
 
-    console.log(`Creating stamp card: ${stampName}`);
+  // --- Create 10 cards ---
+  for (let i = 1; i <= 10; i++) {
+    // Pick a random food theme
+    const theme = foodThemes[Math.floor(Math.random() * foodThemes.length)];
+
+    // const randomCode = Math.floor(Math.random() * 10000);
+    const stampName = `${theme.title}`;
+    const stampTitle = `${theme.title}`;
+    const rewardName = `Reward ${i}`;
+    const stampDescription = `${theme.desc} Limited time offer`;
+
+    console.log(`\n🍔 Creating stamp card: ${stampName}`);
 
     // Click "New Stamp Card"
     await page.getByRole("button", { name: "New Stamp Card" }).nth(1).click();
 
-    // Wait for the form page to load fully
     await page.waitForSelector('input[placeholder="Enter Stamp Card Name"]', {
       state: "visible",
       timeout: 15000,
     });
-    await page.waitForTimeout(1500);
 
     // Fill in details
     await page
@@ -68,118 +91,145 @@ test("Login and create 10 valid stamp cards", async ({ page, context }) => {
       .getByRole("textbox", { name: "Enter Stamp Card Title" })
       .fill(stampTitle);
 
-    // await page.locator('div').filter({ hasText: /^Branch\*Select an option$/ }).getByRole('combobox').click();
-    // await page.waitForTimeout(500);
-    // await page.getByRole('option', { name: 'Automation Branch 10' }).click();
-
-    // Click dropdown
+    // --- Select random branch ---
     await page
       .locator("div")
       .filter({ hasText: /^Branch\*Select an option$/ })
       .getByRole("combobox")
       .click();
+
     await page.waitForTimeout(500);
+    const branchOptions = page.getByRole("option");
+    const branchCount = await branchOptions.count();
 
-    // Get all available branch options
-    const options = page.getByRole("option");
-    const optionCount = await options.count();
+    if (branchCount === 0) throw new Error("❌ No branches found!");
 
-    if (optionCount === 0) throw new Error("❌ No branches found in dropdown!");
-
-    // Pick a random branch
-    const randomIndex = Math.floor(Math.random() * optionCount);
-    const randomOption = options.nth(randomIndex);
-    const branchName = await randomOption.innerText();
-
-    // Click the random branch
-    await randomOption.click();
-    console.log(`🎯 Selected branch: ${branchName}`);
+    const randomBranchIndex = Math.floor(Math.random() * branchCount);
+    const randomBranch = branchOptions.nth(randomBranchIndex);
+    const branchName = await randomBranch.innerText();
+    await randomBranch.click();
+    console.log(`🏢 Selected branch: ${branchName}`);
 
     await page.waitForTimeout(1000);
 
-    await page.getByRole("textbox", { name: "www.xyz.com" }).fill("www.fb.com");
+    // After branch selection (make sure branch is selected before this)
+    await page.waitForTimeout(500); // small wait for UI update
+
+    // Generate random number between 1 and 9
+    const randomTwoDigit = Math.floor(Math.random() * 9) + 1;
+
+    // Locate your input field by unique attributes (maxlength="2")
+    const twoDigitInput = page.locator('input[maxlength="2"]');
+
+    // Wait until it's visible and interactable
+    await twoDigitInput.waitFor({ state: "visible" });
+
+    // Clear existing value and type random number
+    await twoDigitInput.fill(randomTwoDigit.toString());
+
+    console.log(
+      `✅ Filled random number (${randomTwoDigit}) into maxlength="2" input`
+    );
+
+    // Website and description
+    await page
+      .getByRole("textbox", { name: "www.xyz.com" })
+      .fill("www.fastfood.com");
     await page
       .getByRole("textbox", { name: "Add offer details" })
-      .fill(`Exciting deal for ${stampTitle}`);
+      .fill(stampDescription);
+
+    // --- Select random fast food category ---
+    await page
+      .locator("div")
+      .filter({ hasText: /^Category\*Select an option$/ })
+      .getByRole("combobox")
+      .click();
+
+    await page.waitForSelector('[role="option"]', { timeout: 5000 });
+    const allCategories = await page.locator('[role="option"]').allInnerTexts();
+
+    // Filter only fast-food related options (if available)
+    const fastFoodCategories = allCategories.filter((c) =>
+      /(burger|pizza|fries|chicken|wrap|taco|ice cream|hot dog)/i.test(c)
+    );
+
+    const finalCategories =
+      fastFoodCategories.length > 0 ? fastFoodCategories : allCategories;
+    const randomCategory =
+      finalCategories[Math.floor(Math.random() * finalCategories.length)];
 
     await page
-      .getByRole("combobox")
-      .filter({ hasText: "Select an option" })
+      .getByRole("option", { name: randomCategory, exact: true })
       .click();
-    await page.getByRole("option", { name: "Burgers" }).click();
+    console.log(`🍟 Selected fast food category: ${randomCategory}`);
 
     await page.getByRole("button", { name: "Next" }).nth(1).click();
 
-    // Reward setup
-    // await page.getByRole('textbox', { name: 'Enter number' }).fill('02');
-    // await page.getByRole('combobox').filter({ hasText: 'Select an option' }).click();
-    // await page.getByText('Decrease Stamps').click();
-    // await page.getByRole('textbox', { name: 'Enter number of stamps' }).fill('3');
-
-    // --- Dynamic stamp numbers ---
+    // --- Reward setup ---
     const randomNumber = Math.floor(Math.random() * 5) + 1;
-    const randomStampCount = Math.floor(Math.random() * 5) + 1;
-
     await page
       .getByRole("textbox", { name: "Enter number" })
       .fill(randomNumber.toString());
-    await page.waitForTimeout(100); // small wait
 
     await page
       .getByRole("combobox")
       .filter({ hasText: "Select an option" })
+      .first()
       .click();
-    await page.waitForTimeout(200); // small pause before selecting option
+
     const optionType =
-      Math.random() < 0.5 ? "Increase Stamps" : "Decrease Stamps";
+      Math.random() < 0.5 ? "Increase Reward" : "Decrease Stamps";
     await page.getByText(optionType, { exact: true }).click();
-    await page.waitForTimeout(200); // tiny wait after selection
 
-    await page
-      .getByRole("textbox", { name: "Enter number of stamps" })
-      .fill(randomStampCount.toString());
-    await page.waitForTimeout(100); // tiny wait
-    console.log(
-      `🔢 Number: ${randomNumber}, Stamps: ${randomStampCount}, Type: ${optionType}`
-    );
+    if (optionType === "Increase Reward") {
+      const randomRewardName = `Reward${Math.random()
+        .toString(36)
+        .substring(2, 7)}`;
+      await page
+        .getByRole("textbox", { name: "Enter New Reward Name" })
+        .fill(randomRewardName);
+      console.log(`🎁 ${optionType} → ${randomRewardName}`);
+    } else {
+      const randomStampCount = Math.floor(Math.random() * 2) + 1;
+      await page
+        .getByRole("textbox", { name: "Enter number of stamps" })
+        .fill(randomStampCount.toString());
+      console.log(`🔢 ${optionType} → ${randomStampCount} stamps`);
+    }
 
+    await page.waitForTimeout(200);
+
+    // Escalation & publish
     await page.getByRole("button", { name: "Add Escalation Rule" }).click();
     await page.getByRole("button", { name: "Apply" }).click();
-
     await page.getByRole("textbox", { name: "Reward Name" }).fill(rewardName);
     await page.getByRole("button", { name: "Add", exact: true }).click();
 
     await page.getByRole("button", { name: "Next" }).first().click();
     await page.getByRole("button", { name: "Publish" }).first().click();
 
-    // Wait for publish process to complete
     await page.waitForTimeout(4000);
     await page.waitForLoadState("networkidle");
-    console.log(`✅ Stamp card ${i} published.`);
+    console.log(`✅ Stamp card ${i} (${stampTitle}) published successfully.`);
 
-    // Navigate back to list before next iteration with retry
+    // Return safely to list
     try {
       await page.goto(
         "https://stp2.rootdevs.xyz/en/retailer/my-stamp-card?page=1&limit=10",
-        {
-          waitUntil: "domcontentloaded",
-          timeout: 60000,
-        }
+        { waitUntil: "domcontentloaded", timeout: 60000 }
       );
-    } catch (e) {
+    } catch {
       console.warn("⚠️ Reload failed once, retrying...");
-      await page.waitForTimeout(5000);
+      await page.waitForTimeout(3000);
       await page.goto(
         "https://stp2.rootdevs.xyz/en/retailer/my-stamp-card?page=1&limit=10",
-        {
-          waitUntil: "domcontentloaded",
-          timeout: 60000,
-        }
+        { waitUntil: "domcontentloaded", timeout: 60000 }
       );
     }
 
-    await page.waitForTimeout(1500); // short pause before next card
+    await page.waitForTimeout(1500);
   }
 
-  console.log("🎉 All 10 valid stamp cards created successfully!");
+  console.log("🎉 All 10 fast food–themed stamp cards created successfully!");
 });
