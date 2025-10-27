@@ -12,11 +12,11 @@ test("Login and create 10 fast food–themed stamp cards", async ({
   context,
 }) => {
   await context.clearCookies();
-  await page.goto("https://stp2.rootdevs.xyz/en/auth/signin", {
+
+  await page.goto("https://stp2-qa-web.rootdevs.xyz/en/auth/signin", {
     waitUntil: "domcontentloaded",
   });
-  await page.evaluate(() => localStorage.clear());
-
+  // await page.evaluate(() => localStorage.clear());
   // --- Login ---
   await page.waitForSelector('input[placeholder="Enter Your Email Address"]', {
     state: "visible",
@@ -25,10 +25,10 @@ test("Login and create 10 fast food–themed stamp cards", async ({
 
   await page
     .getByRole("textbox", { name: "Enter Your Email Address" })
-    .type("xydaseli@mailinator.com");
+    .type("larugy@mailinator.com");
   await page
     .getByRole("textbox", { name: "Enter Your Password" })
-    .fill("Sh@000000");
+    .type("Sh@000000");
 
   const [response] = await Promise.all([
     page.waitForNavigation({ waitUntil: "networkidle", timeout: 15000 }),
@@ -40,10 +40,11 @@ test("Login and create 10 fast food–themed stamp cards", async ({
     response?.url() || "No navigation detected"
   );
   await expect(page).toHaveURL(/retailer|dashboard|home/i);
+  // await expect(page).toHaveURL(/\/retailer\/dashboard$/i);
 
   // --- Go to Stamp Card page ---
   await page.goto(
-    "https://stp2.rootdevs.xyz/en/retailer/my-stamp-card?page=1&limit=10",
+    "https://stp2-qa-web.rootdevs.xyz/en/retailer/my-stamp-card?page=1&limit=10",
     { waitUntil: "networkidle" }
   );
 
@@ -63,7 +64,7 @@ test("Login and create 10 fast food–themed stamp cards", async ({
   ];
 
   // --- Create 10 cards ---
-  for (let i = 1; i <= 10; i++) {
+  for (let i = 3; i <= 10; i++) {
     // Pick a random food theme
     const theme = foodThemes[Math.floor(Math.random() * foodThemes.length)];
 
@@ -216,14 +217,14 @@ test("Login and create 10 fast food–themed stamp cards", async ({
     // Return safely to list
     try {
       await page.goto(
-        "https://stp2.rootdevs.xyz/en/retailer/my-stamp-card?page=1&limit=10",
+        "https://stp2-qa-web.rootdevs.xyz/en/retailer/my-stamp-card?page=1&limit=10",
         { waitUntil: "domcontentloaded", timeout: 60000 }
       );
     } catch {
       console.warn("⚠️ Reload failed once, retrying...");
       await page.waitForTimeout(3000);
       await page.goto(
-        "https://stp2.rootdevs.xyz/en/retailer/my-stamp-card?page=1&limit=10",
+        "https://stp2-qa-web.rootdevs.xyz/en/retailer/my-stamp-card?page=1&limit=10",
         { waitUntil: "domcontentloaded", timeout: 60000 }
       );
     }

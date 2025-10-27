@@ -1,9 +1,9 @@
 import { test, expect } from "@playwright/test";
 
-test.use({
-  headless: false,
-  launchOptions: { slowMo: 200 },
-});
+// test.use({
+//   headless: false,
+//   launchOptions: { slowMo: 200 },
+// });
 
 test("Login and create stamp card", async ({ page, context }) => {
   await context.clearCookies();

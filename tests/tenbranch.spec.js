@@ -10,7 +10,7 @@ test("Login and create 10 branches", async ({ page, context }) => {
 
   // --- Clean session ---
   await context.clearCookies();
-  await page.goto("https://stp2.rootdevs.xyz/en/auth/signin", {
+  await page.goto("https://stp2-qa-web.rootdevs.xyz/en/auth/signin", {
     waitUntil: "domcontentloaded",
   });
   await page.evaluate(() => localStorage.clear());
@@ -22,7 +22,7 @@ test("Login and create 10 branches", async ({ page, context }) => {
   });
   await page
     .getByRole("textbox", { name: "Enter Your Email Address" })
-    .fill("firo@mailinator.com");
+    .fill("seventh@gmail.com");
   await page
     .getByRole("textbox", { name: "Enter Your Password" })
     .fill("Sh@000000");
@@ -40,12 +40,12 @@ test("Login and create 10 branches", async ({ page, context }) => {
   console.log("✅ Logged in successfully.");
 
   // --- Navigate to Branch Section ---
-  await page.locator("div:nth-child(8) > .h-12").click();
+  await page.locator("div:nth-child(8) > .h-11").click();
   await page.waitForTimeout(1500);
   console.log("📍 Opened branch section.");
 
   // --- Loop for 10 branch creations ---
-  for (let i = 1; i <= 5; i++) {
+  for (let i = 1; i <= 8; i++) {
     console.log(`🏗️ Creating Branch ${i}...`);
 
     // Click “Add New Branch”
