@@ -22,7 +22,7 @@ test("Login and create 10 branches", async ({ page, context }) => {
   });
   await page
     .getByRole("textbox", { name: "Enter Your Email Address" })
-    .fill("seventh@gmail.com");
+    .fill("hukijaxe@mailinator.com");
   await page
     .getByRole("textbox", { name: "Enter Your Password" })
     .fill("Sh@000000");

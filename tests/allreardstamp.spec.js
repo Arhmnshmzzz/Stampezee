@@ -24,7 +24,7 @@ test("Login and create 10 fast food–themed stamp cards with structured reward 
 
   await page
     .getByRole("textbox", { name: "Enter Your Email Address" })
-    .type("seventh@gmail.com");
+    .type("hukijaxe@mailinator.com");
   await page
     .getByRole("textbox", { name: "Enter Your Password" })
     .type("Sh@000000");
@@ -106,7 +106,7 @@ test("Login and create 10 fast food–themed stamp cards with structured reward 
     await page.waitForTimeout(1000);
 
     // --- Random number input ---
-    const randomTwoDigit = Math.floor(Math.random() * 9) + 1;
+    const randomTwoDigit = Math.floor(Math.random() * 7) + 3;
     const twoDigitInput = page.locator('input[maxlength="2"]');
     await twoDigitInput.waitFor({ state: "visible" });
     await twoDigitInput.fill(randomTwoDigit.toString());
@@ -179,15 +179,24 @@ test("Login and create 10 fast food–themed stamp cards with structured reward 
     // }
 
     // ⚡ Lightning Reward
+    await page.waitForSelector("text=Lightning Card", { state: "visible" });
     await page.getByText("Lightning Card").click();
+    await page.waitForSelector('input[name="Enter New Reward Name"]', {
+      state: "visible",
+    });
     await page
       .getByRole("textbox", { name: "Enter New Reward Name" })
       .fill("Lightning Reward");
-    await page.getByRole("button", { name: "Apply" }).click();
+    await Promise.all([
+      page.waitForResponse(
+        (response) =>
+          response.url().includes("/api/") && response.status() === 200
+      ),
+      page.getByRole("button", { name: "Apply" }).click(),
+    ]);
 
     // ✅ Wait for the Lightning modal to close
-    await page.waitForTimeout(1000);
-    await page.waitForSelector("text=Lightning Card", { state: "visible" });
+    await page.waitForSelector('div[role="dialog"]', { state: "hidden" });
 
     // 💎 Exclusive Reward
     await page.getByText("Exclusive Reward").click();
@@ -205,24 +214,27 @@ test("Login and create 10 fast food–themed stamp cards with structured reward 
     await page
       .getByRole("textbox", { name: "Enter Reward Name" })
       .fill("Scratch Reward");
-    await page
-      .getByRole("textbox", { name: "Add terms and conditions" })
-      .fill("Automated scratch reward T&C");
-    await page.getByRole("button", { name: "Apply" }).click();
-
+    await page;
     const rewards = ["Main", "Sign up", "Tiered"];
     for (const reward of rewards) {
-      await page
-        .getByRole("textbox", { name: "Reward Name", exact: true })
-        .fill(reward);
-      await page.getByRole("button", { name: "Add" }).click();
-
-      // Wait for the input field to refresh for the next reward
       await page.waitForSelector('input[placeholder="Reward Name"]', {
         state: "visible",
       });
-      await page.waitForTimeout(500); // extra safety wait
+      await page
+        .getByRole("textbox", { name: "Reward Name", exact: true })
+        .fill(reward);
+      await Promise.all([
+        page.waitForResponse(
+          (response) =>
+            response.url().includes("/api/") && response.status() === 200
+        ),
+        page.getByRole("button", { name: "Add" }).click(),
+      ]);
+
+      // Wait for UI to stabilize
+      await page.waitForTimeout(1000);
     }
+
     // Go to next screen for Tiered reward
 
     // await page.waitForTimeout(1000);

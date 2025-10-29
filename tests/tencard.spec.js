@@ -116,8 +116,8 @@ test("Login and create 10 fast food–themed stamp cards", async ({
     // After branch selection (make sure branch is selected before this)
     await page.waitForTimeout(500); // small wait for UI update
 
-    // Generate random number between 1 and 9
-    const randomTwoDigit = Math.floor(Math.random() * 9) + 1;
+    // Generate random number between 3 and 9
+    const randomTwoDigit = Math.floor(Math.random() * 7) + 3;
 
     // Locate your input field by unique attributes (maxlength="2")
     const twoDigitInput = page.locator('input[maxlength="2"]');
