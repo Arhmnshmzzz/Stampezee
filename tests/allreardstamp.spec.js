@@ -21,10 +21,13 @@ test("Login and create 10 fast food–themed stamp cards with structured reward 
     state: "visible",
     timeout: 10000,
   });
+  await page.getByRole("textbox", { name: "Enter Your Email Address" }).click();
 
-  await page
-    .getByRole("textbox", { name: "Enter Your Email Address" })
-    .type("hukijaxe@mailinator.com");
+  await page.keyboard.type("lumug@mailinator.com", { delay: 100 }); // types like a human
+
+  // await page
+  //   .getByRole("textbox", { name: "Enter Your Email Address" })
+  //   .type("lumug@mailinator.com");
   await page
     .getByRole("textbox", { name: "Enter Your Password" })
     .type("Sh@000000");
@@ -52,7 +55,7 @@ test("Login and create 10 fast food–themed stamp cards with structured reward 
     { title: "Pizza Lovers Deal", desc: "Collect stamps for cheesy pizza" },
     { title: "Fried Chicken Feast", desc: "Crunchy deals for chicken lovers" },
     { title: "French Fry Fiesta", desc: "Get free fries with loyalty stamps" },
-    { title: "Wrap  Roll Combo", desc: "Earn points for every tasty wrap" },
+    { title: "Wrap Roll Combo", desc: "Earn points for every tasty wrap" },
     {
       title: "Ice Cream Magic",
       desc: "Scoop up rewards for your sweet tooth.",
@@ -144,107 +147,88 @@ test("Login and create 10 fast food–themed stamp cards with structured reward 
     // Proceed to next step
     await page.getByRole("button", { name: "Next" }).nth(1).click();
 
-    // -------------------- ✅ REPLACED WITH STRUCTURED REWARD STEPS --------------------
     console.log("⚡ Adding structured reward configuration...");
 
-    // Lightning & Exclusive Rewards
-    // await page.getByText("Lightning Card").click();
-    // await page
-    //   .getByRole("textbox", { name: "Enter New Reward Name" })
-    //   .fill("Lightning Reward");
-    // await page.getByRole("button", { name: "Apply" }).click();
-    // await page.getByText("Exclusive Reward").click();
-    // await page
-    //   .getByRole("textbox", { name: "Enter New Reward Name" })
-    //   .fill("Exclusive Reward");
-    // await page.getByRole("button", { name: "Apply" }).click();
+    // Randomized reward adjustments
+    const randomNumber = Math.floor(Math.random() * 5) + 1;
+    await page
+      .getByRole("textbox", { name: "Enter number" })
+      .fill(randomNumber.toString());
 
-    // // Scratch Card Reward
-    // await page.getByText("Scratch Card Reward").click();
-    // await page
-    //   .getByRole("textbox", { name: "Enter Reward Name" })
-    //   .fill("Scratch Reward");
-    // await page
-    //   .getByRole("textbox", { name: "Add terms and conditions" })
-    //   .fill("Automated scratch reward T&C");
-    // await page.getByRole("button", { name: "Apply" }).click();
+    await page
+      .getByRole("combobox")
+      .filter({ hasText: "Select an option" })
+      .first()
+      .click();
 
-    // // Add “Main” and “Sign up” rewards in current screen
-    // const firstTwoRewards = ["Main", "Sign up", "Tiered"];
-    // for (const reward of firstTwoRewards) {
-    //   await page
-    //     .getByRole("textbox", { name: "Reward Name", exact: true })
-    //     .fill(reward);
-    //   await page.getByRole("button", { name: "Add" }).click();
-    // }
+    const optionType =
+      Math.random() < 0.5 ? "Increase Reward" : "Decrease Stamps";
+    await page.getByText(optionType, { exact: true }).click();
+
+    if (optionType === "Increase Reward") {
+      const randomRewardName = `Reward${Math.random()
+        .toString(36)
+        .substring(2, 7)}`;
+      await page
+        .getByRole("textbox", { name: "Enter New Reward Name" })
+        .fill(randomRewardName);
+      console.log(`🎁 ${optionType} → ${randomRewardName}`);
+    } else {
+      const randomStampCount = Math.floor(Math.random() * 2) + 1;
+      await page
+        .getByRole("textbox", { name: "Enter number of stamps" })
+        .fill(randomStampCount.toString());
+      console.log(`🔢 ${optionType} → ${randomStampCount} stamps`);
+    }
+
+    await page.waitForTimeout(200);
 
     // ⚡ Lightning Reward
-    await page.waitForSelector("text=Lightning Card", { state: "visible" });
     await page.getByText("Lightning Card").click();
-    await page.waitForSelector('input[name="Enter New Reward Name"]', {
-      state: "visible",
-    });
+    await page.getByRole("textbox", { name: "Enter New Reward Name" }).click();
     await page
       .getByRole("textbox", { name: "Enter New Reward Name" })
-      .fill("Lightning Reward");
-    await Promise.all([
-      page.waitForResponse(
-        (response) =>
-          response.url().includes("/api/") && response.status() === 200
-      ),
-      page.getByRole("button", { name: "Apply" }).click(),
-    ]);
-
-    // ✅ Wait for the Lightning modal to close
-    await page.waitForSelector('div[role="dialog"]', { state: "hidden" });
+      .fill("Lighting Reward");
 
     // 💎 Exclusive Reward
     await page.getByText("Exclusive Reward").click();
+    await page.getByRole("textbox", { name: "Enter New Reward Name" }).click();
     await page
       .getByRole("textbox", { name: "Enter New Reward Name" })
-      .fill("Exclusive Reward");
+      .fill("asdasdasd");
     await page.getByRole("button", { name: "Apply" }).click();
 
-    // ✅ Wait again for stability before next reward
-    await page.waitForTimeout(1000);
-    await page.waitForSelector("text=Exclusive Reward", { state: "visible" });
-
-    // 🎯 Scratch Card Reward
     await page.getByText("Scratch Card Reward").click();
+    await page.getByRole("textbox", { name: "Enter Reward Name" }).click();
     await page
       .getByRole("textbox", { name: "Enter Reward Name" })
-      .fill("Scratch Reward");
-    await page;
+      .fill("scratch Reward");
+    await page
+      .getByRole("textbox", { name: "Add terms and conditions" })
+      .click();
+    await page
+      .getByRole("textbox", { name: "Add terms and conditions" })
+      .fill("Added terms and conditions");
+
+    // Add reward types
     const rewards = ["Main", "Sign up", "Tiered"];
+
     for (const reward of rewards) {
       await page.waitForSelector('input[placeholder="Reward Name"]', {
         state: "visible",
       });
+
       await page
         .getByRole("textbox", { name: "Reward Name", exact: true })
         .fill(reward);
-      await Promise.all([
-        page.waitForResponse(
-          (response) =>
-            response.url().includes("/api/") && response.status() === 200
-        ),
-        page.getByRole("button", { name: "Add" }).click(),
-      ]);
 
-      // Wait for UI to stabilize
+      await page.getByRole("button", { name: "Add" }).click();
+
+      // Give UI a brief pause for stability
       await page.waitForTimeout(1000);
+
+      console.log(`🎁 Added reward: ${reward}`);
     }
-
-    // Go to next screen for Tiered reward
-
-    // await page.waitForTimeout(1000);
-
-    // await page
-    //   .getByRole("textbox", { name: "Reward Name", exact: true })
-    //   .fill("Tiered");
-    // await page.getByRole("button", { name: "Add" }).click();
-
-    console.log("✅ Structured reward configuration completed.");
 
     // Publish
     await page.getByRole("button", { name: "Next" }).first().click();
