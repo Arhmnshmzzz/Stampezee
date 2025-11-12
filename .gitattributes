@@ -1,5 +1,9 @@
+# Force language detection for code
 *.js linguist-language=JavaScript
 *.ts linguist-language=TypeScript
-*.json linguist-language=JSON   
-test-results/* linguist-detectable=false
+*.json linguist-language=JSON
+
+# Ignore Playwright generated folders and test artifacts
 playwright-report/* linguist-detectable=false
+test-results/* linguist-detectable=false
+node_modules/* linguist-detectable=false
