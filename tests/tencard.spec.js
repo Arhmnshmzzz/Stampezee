@@ -25,7 +25,7 @@ test("Login and create 10 fast food–themed stamp cards", async ({
 
   await page
     .getByRole("textbox", { name: "Enter Your Email Address" })
-    .type("larugy@mailinator.com");
+    .type("lumug@mailinator.com");
   await page
     .getByRole("textbox", { name: "Enter Your Password" })
     .type("Sh@000000");

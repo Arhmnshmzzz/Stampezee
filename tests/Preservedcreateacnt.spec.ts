@@ -3,7 +3,7 @@ import path from "path";
 test('test', async ({ page }) => {
   await page.goto('https://stp2-qa-web.rootdevs.xyz/en/auth/signup');
   console.log("🌐 Navigated to the homepage");
-
+await page.waitForTimeout(2000);
   await page.getByRole('textbox', { name: 'StampEzee' }).click();
   await page.getByRole('textbox', { name: 'StampEzee' }).fill('Starbucks');
 

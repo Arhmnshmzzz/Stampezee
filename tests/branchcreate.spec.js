@@ -6,7 +6,7 @@ test.use({
 
 test("Login and create stamp card", async ({ page, context }) => {
   await context.clearCookies();
-  await page.goto("https://stp2.rootdevs.xyz/en/auth/signin", {
+  await page.goto("https://stp2-qa-web.rootdevs.xyz/en/auth/signin", {
     waitUntil: "domcontentloaded",
   });
   await page.evaluate(() => localStorage.clear());

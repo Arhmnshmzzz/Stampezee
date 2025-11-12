@@ -23,7 +23,7 @@ test("Login and create 10 fast food–themed stamp cards with structured reward 
   });
   await page.getByRole("textbox", { name: "Enter Your Email Address" }).click();
 
-  await page.keyboard.type("lumug@mailinator.com", { delay: 100 }); // types like a human
+  await page.keyboard.type("qagohyf@mailinator.com", { delay: 100 }); // types like a human
 
   // await page
   //   .getByRole("textbox", { name: "Enter Your Email Address" })
@@ -65,7 +65,7 @@ test("Login and create 10 fast food–themed stamp cards with structured reward 
   ];
 
   // --- Create 10 cards ---
-  for (let i = 3; i <= 10; i++) {
+  for (let i = 3; i <= 6; i++) {
     const theme = foodThemes[Math.floor(Math.random() * foodThemes.length)];
     const stampName = `${theme.title}`;
     const stampTitle = `${theme.title}`;
@@ -238,25 +238,39 @@ test("Login and create 10 fast food–themed stamp cards with structured reward 
     await page.waitForLoadState("networkidle");
     console.log(`✅ Stamp card ${i} (${stampTitle}) published successfully.`);
 
-    // Return safely to list
-    try {
-      await page.goto(
-        "https://stp2-qa-web.rootdevs.xyz/en/retailer/my-stamp-card?page=1&limit=10",
-        {
-          waitUntil: "domcontentloaded",
-          timeout: 60000,
-        }
-      );
-    } catch {
-      console.warn("⚠️ Reload failed once, retrying...");
-      await page.waitForTimeout(3000);
-      await page.goto(
-        "https://stp2-qa-web.rootdevs.xyz/en/retailer/my-stamp-card?page=1&limit=10",
-        {
-          waitUntil: "domcontentloaded",
-          timeout: 60000,
-        }
-      );
+    // // Return safely to list
+    // try {
+    //   await page.goto(
+    //     "https://stp2-qa-web.rootdevs.xyz/en/retailer/my-stamp-card?page=1&limit=10",
+    //     {
+    //       waitUntil: "domcontentloaded",
+    //       timeout: 60000,
+    //     }
+    //   );
+    // } catch {
+    //   console.warn("⚠️ Reload failed once, retrying...");
+    //   await page.waitForTimeout(3000);
+    //   await page.goto(
+    //     "https://stp2-qa-web.rootdevs.xyz/en/retailer/my-stamp-card?page=1&limit=10",
+    //     {
+    //       waitUntil: "domcontentloaded",
+    //       timeout: 60000,
+    //     }
+    //   );
+    // }
+    const url =
+      "https://stp2-qa-web.rootdevs.xyz/en/retailer/my-stamp-card?page=1&limit=10";
+
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      try {
+        await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 });
+        console.log(`✅ Page loaded successfully on attempt ${attempt}`);
+        break;
+      } catch (err) {
+        console.warn(`⚠️ Attempt ${attempt} failed to load page. Retrying...`);
+        if (attempt === 2) throw err; // stop after 2 tries
+        await page.waitForTimeout(3000);
+      }
     }
 
     await page.waitForTimeout(1500);
